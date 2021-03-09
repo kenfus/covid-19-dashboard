@@ -59,7 +59,7 @@ def load_data():
 
 """
 # Covid-19 Data Exploration Dashboard
-[![Github](https://github.githubassets.com/images/modules/logos_page/Octocat.png?logo=github&style=social)](https://github.com/kenfus/covid-19-dashboard)
+[![button](https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg?=2x2)](https://github.com/kenfus/covid-19-dashboard)
 &nbsp[![Follow](https://img.shields.io/twitter/follow/jrieke?style=social)](https://www.twitter.com/jrieke)
 """
 st.markdown("<br>", unsafe_allow_html=True)
