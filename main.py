@@ -57,18 +57,17 @@ def load_data():
     data.to_csv(str(DOWNLOADS_PATH / "data.csv"), index=False)
 
 
-
 """
-# Code Generator for Machine Learning
-[![Star](https://img.shields.io/github/stars/jrieke/traingenerator.svg?logo=github&style=social)](https://gitHub.com/jrieke/traingenerator/stargazers)
+# Covid-19 Data Exploration Dashboard
+[![Github](https://github.githubassets.com/images/modules/logos_page/Octocat.png?logo=github&style=social)](https://github.com/kenfus/covid-19-dashboard)
 &nbsp[![Follow](https://img.shields.io/twitter/follow/jrieke?style=social)](https://www.twitter.com/jrieke)
-&nbsp[![Buy me a coffee](https://img.shields.io/badge/Buy%20me%20a%20coffee--yellow.svg?logo=buy-me-a-coffee&logoColor=orange&style=social)](https://www.buymeacoffee.com/jrieke)
 """
 st.markdown("<br>", unsafe_allow_html=True)
-"""Jumpstart your machine learning code:
-1. Specify model in the sidebar *(click on **>** if closed)*
-2. Training code will be generated below
-3. Download and do magic! :sparkles:
+"""Explore the Covid-Data from [Our World in Data](https://github.com/owid).
+1. Select the Country you would like to analyze on the left.
+2. Select what you would like to see.
+3. :sparkles:
+4. Select a second country to compare it to by clicking on the Checkbox!
 ---
 """
 
@@ -87,8 +86,8 @@ data = data.pivot_table(index=['Location'], values=['Total cases per million']).
 data.sort_values(by=['Total cases per million'], inplace=True, ascending=False)
 
 # Plot Data:
-st.write("Top {} Countries with the highest number of total cases".format(MAX_COUNTRIES_TO_SHOW))
-st.write(alt.Chart(data.head(MAX_COUNTRIES_TO_SHOW)).mark_bar().encode(
+st.write("Top {} Countries with the highest Total cases per million.".format(MAX_COUNTRIES_TO_SHOW))
+st.write(alt.Chart(data.head(MAX_COUNTRIES_TO_SHOW), width=700).mark_bar().encode(
     x=alt.X('Location', sort=None),
     y='Total cases per million',
 ))
@@ -107,7 +106,7 @@ with st.sidebar:
     # st.error(
     #     "Found a bug? [Report it](https://github.com/jrieke/traingenerator/issues) 🐛"
     # )
-    st.write("## Task")
+    st.write("## First Plot")
     country = st.selectbox(
         "Which Country do you want to analyse?", countries_df
     )
@@ -121,20 +120,46 @@ with st.sidebar:
         #data_selected = data_selected.pivot_table(index=['Location'], values=[type_data]).reset_index()
         data_selected['Date'] = pd.to_datetime(data_selected['Date'], format = '%Y-%m-%d')
         data_selected = data_selected.query("Location == @country")
-        print(data_selected)
+
     else:
         pass
+    show_second_plot = st.checkbox('Show second Plot')
 
 # Plot selected Data:
 st.write("{} of {}.".format(type_data, country))
 
-#st.line_chart(data_selected)
+# First Plot:
 
-st.write(alt.Chart(data_selected.reset_index()).mark_area(
+st.write(alt.Chart(data_selected.reset_index(), width=700).mark_area(
     color="lightblue",
     line=True
     ).encode(
         x='Date',
         y=type_data
         )
-)#.transform_filter(alt.datum.symbol == 'GOOG')
+)
+
+if show_second_plot:
+    with st.sidebar:
+        st.write("## Second Plot")
+        country_2 = st.selectbox(
+            "Which Country do you want to compare it to?", countries_df
+        )
+    # # Load Data:
+    data_selected = pd.read_csv(str(DOWNLOADS_PATH / "data.csv"), usecols = ['Date', 'Location', 'Total cases per million', type_data]).drop_duplicates()
+    data_selected = data_selected[data_selected['Total cases per million']>THRESHOLD_FOR_CASES_PER_MILLION].dropna()
+    #data_selected = data_selected.pivot_table(index=['Location'], values=[type_data]).reset_index()
+    data_selected['Date'] = pd.to_datetime(data_selected['Date'], format = '%Y-%m-%d')
+    data_selected = data_selected.query("Location == @country | Location == @country_2")
+    # Plot selected Data:
+    st.write("{} of {} and {}.".format(type_data, country, country_2))
+
+    st.write(alt.Chart(data_selected.reset_index(), width=700).mark_area(
+        color="lightblue",
+        line=True
+        ).encode(
+            x='Date',
+            y=type_data,
+            color = 'Location'
+            )
+    )
