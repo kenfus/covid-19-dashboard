@@ -59,15 +59,14 @@ def load_data():
 
 """
 # Covid-19 Data Exploration Dashboard
-[![button](https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg?=2x2)](https://github.com/kenfus/covid-19-dashboard)
-&nbsp[![Follow](https://img.shields.io/twitter/follow/jrieke?style=social)](https://www.twitter.com/jrieke)
+[![button](https://github.com/kenfus/covid-19-dashboard/blob/master/hosting/GitHub_Logo.png?raw=True)](https://github.com/kenfus/covid-19-dashboard)
 """
 st.markdown("<br>", unsafe_allow_html=True)
-"""Explore the Covid-Data from [Our World in Data](https://github.com/owid).
+"""## Explore the Covid-Data from [Our World in Data](https://github.com/owid).
 1. Select the Country you would like to analyze on the left.
 2. Select what you would like to see.
 3. :sparkles:
-4. Select a second country to compare it to by clicking on the Checkbox!
+4. Optional: Select a second country to compare it to by clicking on the Checkbox!
 ---
 """
 
@@ -163,3 +162,7 @@ if show_second_plot:
             color = 'Location'
             )
     )
+"""
+---
+#### Heavily based on [Code Generator for Machine Learning](https://traingenerator.jrieke.com/)
+"""
