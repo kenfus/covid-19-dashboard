@@ -6,6 +6,8 @@ import pydeck as pdk
 import altair as alt
 import pathlib
 import time
+import plotly.express as px
+import os 
 
 ### Param
 DATA_URL = "https://github.com/owid/covid-19-data/raw/master/public/data/owid-covid-data.csv"
@@ -48,13 +50,14 @@ if not DOWNLOADS_PATH.is_dir():
 ### Start of Webapp:
 # Get Data:
 def load_data():
-    data = pd.read_csv(DATA_URL)
-    long_lat_map = pd.read_csv(ISO_TO_LONLAT_URL, engine='python', sep=',', skipinitialspace=True)[['Alpha-3 code','Latitude (average)', 'Longitude (average)']]
-    long_lat_map = long_lat_map.rename(columns={"Latitude (average)": "lat", "Longitude (average)": "lon"})
-    data = data.merge(long_lat_map, how = 'inner', left_on = 'iso_code', right_on = 'Alpha-3 code').drop(columns = 'iso_code')
-    data.columns = data.columns.str.replace("_", " ")
-    data.columns = map(str.capitalize, data.columns)
-    data.to_csv(str(DOWNLOADS_PATH / "data.csv"), index=False)
+    if not os.path.exists(DATA_URL):
+        data = pd.read_csv(DATA_URL)
+        long_lat_map = pd.read_csv(ISO_TO_LONLAT_URL, engine='python', sep=',', skipinitialspace=True)[['Alpha-3 code','Latitude (average)', 'Longitude (average)']]
+        long_lat_map = long_lat_map.rename(columns={"Latitude (average)": "lat", "Longitude (average)": "lon"})
+        data = data.merge(long_lat_map, how = 'inner', left_on = 'iso_code', right_on = 'Alpha-3 code').drop(columns = 'iso_code')
+        data.columns = data.columns.str.replace("_", " ")
+        data.columns = map(str.capitalize, data.columns)
+        data.to_csv(str(DOWNLOADS_PATH / "data.csv"), index=False)
 
 
 """
@@ -74,16 +77,27 @@ st.markdown("<br>", unsafe_allow_html=True)
 data_load_state = st.text('Loading data...')
 load_data()
 data_load_state.text("Done!")
-time.sleep(1)
-data_load_state.text(None)
 
 ## Show total cases per million per country:
 # Load Data:
-data = pd.read_csv(str(DOWNLOADS_PATH / "data.csv"), usecols = ['Location', 'Total cases per million']).drop_duplicates()
+data = pd.read_csv(str(DOWNLOADS_PATH / "data.csv"), usecols = ['Location', 'Alpha-3 code', 'Total cases per million']).drop_duplicates()
 data = data[data['Total cases per million']>THRESHOLD_FOR_CASES_PER_MILLION].dropna()
-data = data.pivot_table(index=['Location'], values=['Total cases per million']).reset_index()
+data = data.pivot_table(index=['Location', 'Alpha-3 code'], values=['Total cases per million']).reset_index()
 data.sort_values(by=['Total cases per million'], inplace=True, ascending=False)
 
+# Plot Data with Plotly:
+st.write('Total Cases per Million of Countries.')
+fig = px.choropleth(data,
+                    locations = 'Alpha-3 code',
+                    color="Total cases per million", 
+                    hover_name = "Location",
+                    projection="natural earth",
+                    color_continuous_scale=px.colors.sequential.Viridis,
+                    width=800,
+                    height=600,
+                    )
+
+st.plotly_chart(fig)
 # Plot Data:
 st.write("Top {} Countries with the highest Total cases per million.".format(MAX_COUNTRIES_TO_SHOW))
 st.write(alt.Chart(data.head(MAX_COUNTRIES_TO_SHOW), width=700).mark_bar().encode(
@@ -123,13 +137,14 @@ with st.sidebar:
     else:
         pass
     show_second_plot = st.checkbox('Show second Plot')
+    compare_countries = st.checkbox('Compare Countries to each other')
 
 # Plot selected Data:
 st.write("{} of {}.".format(type_data, country))
 
 # First Plot:
 
-st.write(alt.Chart(data_selected.reset_index(), width=700).mark_area(
+st.write(alt.Chart(data_selected.reset_index(), width=700).mark_line(
     color="lightblue",
     line=True
     ).encode(
@@ -144,7 +159,7 @@ if show_second_plot:
         country_2 = st.selectbox(
             "Which Country do you want to compare it to?", countries_df
         )
-    # # Load Data:
+    # Load Data:
     data_selected = pd.read_csv(str(DOWNLOADS_PATH / "data.csv"), usecols = ['Date', 'Location', 'Total cases per million', type_data]).drop_duplicates()
     data_selected = data_selected[data_selected['Total cases per million']>THRESHOLD_FOR_CASES_PER_MILLION].dropna()
     #data_selected = data_selected.pivot_table(index=['Location'], values=[type_data]).reset_index()
@@ -153,7 +168,7 @@ if show_second_plot:
     # Plot selected Data:
     st.write("{} of {} and {}.".format(type_data, country, country_2))
 
-    st.write(alt.Chart(data_selected.reset_index(), width=700).mark_area(
+    st.write(alt.Chart(data_selected.reset_index(), width=700).mark_line(
         color="lightblue",
         line=True
         ).encode(
@@ -162,6 +177,19 @@ if show_second_plot:
             color = 'Location'
             )
     )
+if compare_countries:
+    # Load Data:
+    data_selected = pd.read_csv(str(DOWNLOADS_PATH / "data.csv"), usecols = ['Location', 'Total cases per million', type_data]).drop_duplicates()
+    data_selected = data_selected[data_selected['Total cases per million']>THRESHOLD_FOR_CASES_PER_MILLION].dropna()
+    data_selected = data_selected.pivot_table(index=['Location'], values=[type_data]).reset_index()
+    data_selected.sort_values(by=[type_data], inplace=True, ascending=False)
+    # Plot Data:
+    st.write("Top {} Countries with the highest {}.".format(MAX_COUNTRIES_TO_SHOW, type_data))
+    st.write(alt.Chart(data_selected.head(MAX_COUNTRIES_TO_SHOW), width=700).mark_bar().encode(
+        x=alt.X('Location', sort=None),
+        y=type_data,
+    ))
+
 """
 ---
 #### Heavily based on [Code Generator for Machine Learning](https://traingenerator.jrieke.com/)
