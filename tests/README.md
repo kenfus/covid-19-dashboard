@@ -1,4 +1,5 @@
 # WET - FS21 - Abgabe Vincenzo Timmel
+![Covid-19 Dashboard](https://github.com/kenfus/covid-19-dashboard/blob/master/hosting/covid-19-dashboard.png?raw=true)
 ## Requirements
 Requirements can be installed with `pip install requirements.txt`.
 It's recommended to first create a virtual env (e.g. with conda)
