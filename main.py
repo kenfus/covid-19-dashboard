@@ -66,31 +66,75 @@ def load_data():
 """
 st.markdown("<br>", unsafe_allow_html=True)
 """## Explore the Covid-Data from [Our World in Data](https://github.com/owid).
-1. Select the Country you would like to analyze on the left.
-2. Select what you would like to see.
-3. :sparkles:
-4. Optional: Select a second country to compare it to by clicking on the Checkbox!
----
+First, you can see, based on the Metric chosen on the left, how the world is doing in the fight against Covid.
+
+Below, it is possible to single out countries. If you want, you can also compare countries against each other and see how they are doing.
+
+Some Countries are missing because the Data is either invalid or does just not exist.
 """
 
 # Load data:
 data_load_state = st.text('Loading data...')
 load_data()
-data_load_state.text("Done!")
+data_load_state = st.text('New data fetched from https://github.com/owid!')
 
-## Show total cases per million per country:
-# Load Data:
-data = pd.read_csv(str(DOWNLOADS_PATH / "data.csv"), usecols = ['Location', 'Alpha-3 code', 'Total cases per million']).drop_duplicates()
+# Load Data to get information in it:
+data = pd.read_csv(str(DOWNLOADS_PATH / "data.csv"), usecols = ['Location', 'Total cases per million']).drop_duplicates()
 data = data[data['Total cases per million']>THRESHOLD_FOR_CASES_PER_MILLION].dropna()
-data = data.pivot_table(index=['Location', 'Alpha-3 code'], values=['Total cases per million']).reset_index()
-data.sort_values(by=['Total cases per million'], inplace=True, ascending=False)
+data = data.pivot_table(index=['Location'], values=['Total cases per million']).reset_index()
 
+
+# Load countries in Data.
+countries_df = data['Location'].unique()
+
+# Create Sidebar:
+# Show selectors for task and framework in sidebar (based on template_dict). These
+# selectors determine which template (from template_dict) is used (and also which
+# template-specific sidebar components are shown below).
+with st.sidebar:
+    st.info(
+        "🎈 Customize your Dashboard here!"
+    )
+    st.write("## Global View Metric")
+    global_metric = st.selectbox(
+        "Which Metric should be shown in the Global View?", list(DATA_FOR_SELECTION)
+    )
+    st.write("## Analyse specific country")
+    country = st.selectbox(
+        "Which Country do you want to analyse?", countries_df
+    )
+    if isinstance(country, str):
+        type_data = st.selectbox(
+            "Which Metric would you like to see?", list(DATA_FOR_SELECTION)
+        )
+        # Load Data:
+        data_selected = pd.read_csv(str(DOWNLOADS_PATH / "data.csv"), usecols = ['Date', 'Location', 'Total cases per million', type_data]).drop_duplicates()
+        data_selected = data_selected[data_selected['Total cases per million']>THRESHOLD_FOR_CASES_PER_MILLION].dropna()
+        data_selected['Date'] = pd.to_datetime(data_selected['Date'], format = '%Y-%m-%d')
+        data_selected = data_selected.query("Location == @country")
+
+    else:
+        pass
+    show_second_plot = st.checkbox('Show second country')
+
+# Create relevant data for global view:
+# Load Data:
+data_global = pd.read_csv(str(DOWNLOADS_PATH / "data.csv"), usecols = ['Date', 'Location', 'Alpha-3 code', 'Total cases per million', global_metric]).drop_duplicates()
+data_global = data_global[data_global['Total cases per million']>THRESHOLD_FOR_CASES_PER_MILLION].dropna()
+data_global['Date'] = pd.to_datetime(data_global['Date'], format = '%Y-%m-%d')
+data_global = data_global.pivot_table(index=['Location', 'Alpha-3 code'], values=[global_metric]).reset_index()
+data_global.sort_values(by=[global_metric], inplace=True, ascending=False)
+
+# Title
+"""
+## Global View
+"""
 # Plot Data with Plotly:
-st.write('Total Cases per Million of Countries.')
-fig = px.choropleth(data,
-                    locations = 'Alpha-3 code',
-                    color="Total cases per million", 
-                    hover_name = "Location",
+st.write('Global View: {}'.format(global_metric))
+fig = px.choropleth(data_global,
+                    locations="Alpha-3 code",
+                    color=global_metric, 
+                    hover_name="Location",
                     projection="natural earth",
                     color_continuous_scale=px.colors.sequential.Viridis,
                     width=800,
@@ -98,49 +142,17 @@ fig = px.choropleth(data,
                     )
 
 st.plotly_chart(fig)
+
 # Plot Data:
-st.write("Top {} Countries with the highest Total cases per million.".format(MAX_COUNTRIES_TO_SHOW))
-st.write(alt.Chart(data.head(MAX_COUNTRIES_TO_SHOW), width=700).mark_bar().encode(
+st.write("Top {} Countries: {}.".format(MAX_COUNTRIES_TO_SHOW, global_metric))
+st.write(alt.Chart(data_global.head(MAX_COUNTRIES_TO_SHOW), width=700).mark_bar().encode(
     x=alt.X('Location', sort=None),
-    y='Total cases per million',
+    y=global_metric,
 ))
 
 
-# Load countries in Data.
-countries_df = data['Location'].unique()
-
-# Show selectors for task and framework in sidebar (based on template_dict). These
-# selectors determine which template (from template_dict) is used (and also which
-# template-specific sidebar components are shown below).
-with st.sidebar:
-    st.info(
-        "🎈 Don't forget to give Vincenzo a high score!"
-    )
-    # st.error(
-    #     "Found a bug? [Report it](https://github.com/jrieke/traingenerator/issues) 🐛"
-    # )
-    st.write("## First Plot")
-    country = st.selectbox(
-        "Which Country do you want to analyse?", countries_df
-    )
-    if isinstance(country, str):
-        type_data = st.selectbox(
-            "What do you want to see?", list(DATA_FOR_SELECTION)
-        )
-        # Load Data:
-        data_selected = pd.read_csv(str(DOWNLOADS_PATH / "data.csv"), usecols = ['Date', 'Location', 'Total cases per million', type_data]).drop_duplicates()
-        data_selected = data_selected[data_selected['Total cases per million']>THRESHOLD_FOR_CASES_PER_MILLION].dropna()
-        #data_selected = data_selected.pivot_table(index=['Location'], values=[type_data]).reset_index()
-        data_selected['Date'] = pd.to_datetime(data_selected['Date'], format = '%Y-%m-%d')
-        data_selected = data_selected.query("Location == @country")
-
-    else:
-        pass
-    show_second_plot = st.checkbox('Show second Plot')
-    compare_countries = st.checkbox('Compare Countries to each other')
-
 # Plot selected Data:
-st.write("{} of {}.".format(type_data, country))
+st.write("{}: {}.".format(country, type_data))
 
 # First Plot:
 
@@ -155,7 +167,7 @@ st.write(alt.Chart(data_selected.reset_index(), width=700).mark_line(
 
 if show_second_plot:
     with st.sidebar:
-        st.write("## Second Plot")
+        st.write("## Second Country")
         country_2 = st.selectbox(
             "Which Country do you want to compare it to?", countries_df
         )
@@ -166,7 +178,7 @@ if show_second_plot:
     data_selected['Date'] = pd.to_datetime(data_selected['Date'], format = '%Y-%m-%d')
     data_selected = data_selected.query("Location == @country | Location == @country_2")
     # Plot selected Data:
-    st.write("{} of {} and {}.".format(type_data, country, country_2))
+    st.write("{} and {}: {}.".format(country, country_2, type_data))
 
     st.write(alt.Chart(data_selected.reset_index(), width=700).mark_line(
         color="lightblue",
@@ -177,20 +189,3 @@ if show_second_plot:
             color = 'Location'
             )
     )
-if compare_countries:
-    # Load Data:
-    data_selected = pd.read_csv(str(DOWNLOADS_PATH / "data.csv"), usecols = ['Location', 'Total cases per million', type_data]).drop_duplicates()
-    data_selected = data_selected[data_selected['Total cases per million']>THRESHOLD_FOR_CASES_PER_MILLION].dropna()
-    data_selected = data_selected.pivot_table(index=['Location'], values=[type_data]).reset_index()
-    data_selected.sort_values(by=[type_data], inplace=True, ascending=False)
-    # Plot Data:
-    st.write("Top {} Countries with the highest {}.".format(MAX_COUNTRIES_TO_SHOW, type_data))
-    st.write(alt.Chart(data_selected.head(MAX_COUNTRIES_TO_SHOW), width=700).mark_bar().encode(
-        x=alt.X('Location', sort=None),
-        y=type_data,
-    ))
-
-"""
----
-#### Heavily based on [Code Generator for Machine Learning](https://traingenerator.jrieke.com/)
-"""
