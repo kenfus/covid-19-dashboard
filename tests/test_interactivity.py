@@ -1,6 +1,6 @@
 from seleniumbase import BaseCase
 
-class Global_view(BaseCase):
+class Global_View(BaseCase):
     def test_basics(self):
         url = "http://localhost:8501"
         self.open(url)
