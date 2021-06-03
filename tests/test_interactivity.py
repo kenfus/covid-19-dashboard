@@ -19,6 +19,7 @@ class Global_View(BaseCase):
         self.assert_text("Global View: Total cases per million", timeout=30)
         self.assert_element_present(".stPlotlyChart")
 
+
 class InternetAccess(BaseCase):
     def test_basics(self):
         self.open(url)
@@ -26,7 +27,7 @@ class InternetAccess(BaseCase):
         self.switch_to_window(1)
         self.assert_title("Our World in Data · GitHub")
 
-# Test currently disabled because it does not work reliable with 
+
 class ScreenShotTest(BaseCase):
     def test_basic(self):
         self.open(url)
