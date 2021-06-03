@@ -32,7 +32,7 @@ jobs:
         seleniumbase install chromedriver latest
     - name: Start Streamlit app
       run: |
-        streamlit run tests/app_to_test.py &
+        streamlit run main.py
     - name: Test with pytest
       run: |
         pytest
