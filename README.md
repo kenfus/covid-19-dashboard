@@ -6,7 +6,7 @@ Requirements can be installed with `pip install requirements.txt`.
 It's recommended to first create a virtual environment (e.g. with conda)
 
 ## Deploy the Streamlit-App
-The app can be started in the Terminal with `streamlit run main.py`
+The app can be started in the Terminal with `streamlit run main.py`. A new Window should open, showing the Dashboard. If not, follow the URL mentioned in the Terminal.
 
 ## Testing
 The testing can be done with `.\tests\test_interactivity.py --demo --browser=<YOUR BROSWER> --maximize-window` with Browser being one of:
