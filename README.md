@@ -14,7 +14,7 @@ The testing can be done with `.\tests\test_interactivity.py --demo --browser=<YO
 - chrome
 - edge 
 
-The Testing can also easily be added 
+The Tests are also automatically run on every Push to GitHub.
 
 ## Overview of App
 The App is a simple Dashboard to display Data about COVID-19 with Data from [Our World in Data](https://github.com/owid). On the App, you can see how most Countries are doing on a Global View in regards with over 20 COVID-19 related Metrics. Also, you can single-out Countries and compare them to each other.
