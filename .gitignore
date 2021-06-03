@@ -6,3 +6,4 @@ tests/data/test_screenshot.png
 tests/latest_logs/*
 .gitignore
 latest_logs/*
+current-screenshot.png
