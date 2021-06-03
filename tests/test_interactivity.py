@@ -19,15 +19,24 @@ class Global_View(BaseCase):
         self.assert_text("Global View: Total cases per million", timeout=30)
         self.assert_element_present(".stPlotlyChart")
 
+class InternetAccess(BaseCase):
+    def test_basics(self):
+        self.open(url)
+        self.click("#explore-the-covid-data-from-our-world-in-data > div:nth-child(1) > span:nth-child(2) > a:nth-child(1)")
+        self.switch_to_window(1)
+        self.assert_title("Our World in Data · GitHub")
+
+# Test currently disabled because it does not work reliable with 
 class ScreenShotTest(BaseCase):
     def test_basic(self):
         self.open(url)
         time.sleep(20)  # give leaflet time to load from web
+        self.set_window_size(800, 600)
         self.save_screenshot("current-screenshot.png")
 
         # test screenshots look exactly the same
         original = cv2.imread(
-            "data/test-screenshot.png"
+            "tests/data/test-screenshot.png"
         )
         duplicate = cv2.imread("current-screenshot.png")
 
@@ -37,9 +46,3 @@ class ScreenShotTest(BaseCase):
         b, g, r = cv2.split(difference)
         assert cv2.countNonZero(b) == cv2.countNonZero(g) == cv2.countNonZero(r) == 0
 
-class InternetAccess(BaseCase):
-    def test_basics(self):
-        self.open(url)
-        self.click("#explore-the-covid-data-from-our-world-in-data > div:nth-child(1) > span:nth-child(2) > a:nth-child(1)")
-        self.switch_to_window(1)
-        self.assert_title("Our World in Data · GitHub")

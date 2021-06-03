@@ -5,3 +5,4 @@ tests/__pycache__/test_interactivity.cpython-38-pytest-6.2.4.pyc
 tests/data/test_screenshot.png
 tests/latest_logs/*
 .gitignore
+latest_logs/*
