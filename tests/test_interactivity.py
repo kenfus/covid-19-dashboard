@@ -27,7 +27,7 @@ class ScreenShotTest(BaseCase):
 
         # test screenshots look exactly the same
         original = cv2.imread(
-            "data/test_screenshot.png"
+            "data/test-screenshot.png"
         )
         duplicate = cv2.imread("current-screenshot.png")
 
