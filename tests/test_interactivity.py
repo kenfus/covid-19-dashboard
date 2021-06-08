@@ -10,7 +10,7 @@ class Global_View(BaseCase):
         self.assert_no_404_errors() 
         self.assert_title("main · Streamlit")
         self.assert_text("Our World in Data")
-        self.assert_text("Albania: Total cases.", timeout=30)
+        self.assert_text("Covid-19 Data Exploration Dashboard", timeout=30)
         self.assert_text("New data fetched from https://github.com/owid!")
         self.click("div.block-container:nth-child(2) > div:nth-child(1) > div:nth-child(3) > div:nth-child(1) > div:nth-child(2) > div:nth-child(1) > div:nth-child(2) > svg:nth-child(1)")
         self.click_xpath("/html/body/div[1]/div[2]/div/div/div[3]/div/div/div/ul/div/div/li[7]/span")
