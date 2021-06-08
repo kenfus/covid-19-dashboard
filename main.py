@@ -121,7 +121,7 @@ data_global = data_global[data_global['Total cases per million']>THRESHOLD_FOR_C
 data_global['Date'] = pd.to_datetime(data_global['Date'], format = '%Y-%m-%d')
 data_global = data_global.pivot_table(index=['Location', 'Alpha-3 code'], values=[global_metric]).reset_index()
 data_global.sort_values(by=[global_metric], inplace=True, ascending=False)
-data_global['global_metric'] = data_global['global_metric'].round(2)
+data_global[global_metric] = data_global[global_metric].round(2)
 
 # Title
 """
