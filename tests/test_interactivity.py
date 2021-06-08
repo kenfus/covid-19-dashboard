@@ -1,10 +1,8 @@
 from seleniumbase import BaseCase
-import cv2
 import time
 
 ##PARAMS FOR TESTS
 url = "http://localhost:8501"
-
 
 class Global_View(BaseCase):
     def test_basics(self):
@@ -20,12 +18,20 @@ class Global_View(BaseCase):
         self.assert_element_present(".stPlotlyChart")
 
 
-class InternetAccess(BaseCase):
+class CovidDataExist(BaseCase):
     def test_basics(self):
-        self.open(url)
-        self.click("#explore-the-covid-data-from-our-world-in-data > div:nth-child(1) > span:nth-child(2) > a:nth-child(1)")
-        self.switch_to_window(1)
-        self.assert_title("Our World in Data · GitHub")
+        self.open("https://github.com/owid/covid-19-data")
+        self.assert_no_404_errors() 
+        self.click_link("public")
+        self.click_link("data")
+        self.assert_text("owid-covid-data.csv")
+
+class LongLatDataExist(BaseCase):
+    def test_basics(self):
+        self.open("https://gist.github.com/cpl/3dc2d19137588d9ae202d67233715478")
+        self.assert_no_404_errors() 
+        self.assert_text("Countries with their (ISO 3166-1) Alpha-2 code, Alpha-3 code, UN M49, average latitude and longitude coordinates FROM https://gist.github.com/tadast/8827699, without duplicates")
+
 
 # Test is disabled because somehow, locally the screenshot has the wrong size of 454xN. However, on Github, the Sreenshot is always 450xN (correct). Thus, it needs figuring out why this is.
 """
