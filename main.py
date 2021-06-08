@@ -32,7 +32,7 @@ DATA_FOR_SELECTION = ['Total cases', 'New cases',
        'Male smokers', 'Handwashing facilities', 'Hospital beds per thousand',
        'Life expectancy', 'Human development index']
 
-THRESHOLD_FOR_CASES_PER_MILLION = 100 # Some countries probably offer no data or clearly wrong data. This is the threshold to filter those out. Also, to keep data lean, we drop a lot of countries.
+THRESHOLD_FOR_CASES_PER_MILLION = 10 # Some countries probably offer no data or clearly wrong data. This is the threshold to filter those out. Also, to keep data lean, we drop a lot of countries.
 MAX_COUNTRIES_TO_SHOW = 30 
 
 # HACK This only works when we've installed streamlit with pipenv, so the
