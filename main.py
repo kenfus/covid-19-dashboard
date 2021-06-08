@@ -1,11 +1,8 @@
 import pandas as pd
-import numpy as np
 from pandas.io.parsers import read_csv
 import streamlit as st
-import pydeck as pdk
 import altair as alt
 import pathlib
-import time
 import plotly.express as px
 import os 
 
@@ -107,7 +104,7 @@ with st.sidebar:
         type_data = st.selectbox(
             "Which Metric would you like to see?", list(DATA_FOR_SELECTION)
         )
-        # Load Data:
+        # Load Data: Save intermediate steps for readability.
         data_selected = pd.read_csv(str(DOWNLOADS_PATH / "data.csv"), usecols = ['Date', 'Location', 'Total cases per million', type_data]).drop_duplicates()
         data_selected = data_selected[data_selected['Total cases per million']>THRESHOLD_FOR_CASES_PER_MILLION].dropna()
         data_selected['Date'] = pd.to_datetime(data_selected['Date'], format = '%Y-%m-%d')
@@ -174,7 +171,6 @@ if show_second_plot:
     # Load Data:
     data_selected = pd.read_csv(str(DOWNLOADS_PATH / "data.csv"), usecols = ['Date', 'Location', 'Total cases per million', type_data]).drop_duplicates()
     data_selected = data_selected[data_selected['Total cases per million']>THRESHOLD_FOR_CASES_PER_MILLION].dropna()
-    #data_selected = data_selected.pivot_table(index=['Location'], values=[type_data]).reset_index()
     data_selected['Date'] = pd.to_datetime(data_selected['Date'], format = '%Y-%m-%d')
     data_selected = data_selected.query("Location == @country | Location == @country_2")
     # Plot selected Data:
