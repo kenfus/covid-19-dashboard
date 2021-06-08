@@ -20,17 +20,13 @@ class Global_View(BaseCase):
 
 class CovidDataExist(BaseCase):
     def test_basics(self):
-        self.open("https://github.com/owid/covid-19-data")
-        self.assert_no_404_errors() 
-        self.click_link("public")
-        self.click_link("data")
-        self.assert_text("owid-covid-data.csv")
+        self.open("https://github.com/owid/covid-19-data/blob/master/public/data/owid-covid-data.csv")
+        self.assert_no_404_errors()
 
 class LongLatDataExist(BaseCase):
     def test_basics(self):
-        self.open("https://gist.github.com/cpl/3dc2d19137588d9ae202d67233715478")
-        self.assert_no_404_errors() 
-        self.assert_text("Countries with their (ISO 3166-1) Alpha-2 code, Alpha-3 code, UN M49, average latitude and longitude coordinates FROM https://gist.github.com/tadast/8827699, without duplicates")
+        self.open("https://gist.githubusercontent.com/cpl/3dc2d19137588d9ae202d67233715478/raw/3d801e76e1ec3e6bf93dd7a87b7f2ce8afb0d5de/countries_codes_and_coordinates.csv")
+        self.assert_no_404_errors()
 
 
 # Test is disabled because somehow, locally the screenshot has the wrong size of 454xN. However, on Github, the Sreenshot is always 450xN (correct). Thus, it needs figuring out why this is.
