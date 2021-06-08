@@ -1,5 +1,11 @@
 # WET - FS21 - Abgabe Vincenzo Timmel
 ![Covid-19 Dashboard](https://github.com/kenfus/covid-19-dashboard/blob/master/hosting/covid-19-dashboard.png?raw=true)
+
+## Deployment
+The app was deployed with [Streamlit Sharing](https://streamlit.io/sharing).
+
+The deployed Dashboard can be found here: https://share.streamlit.io/kenfus/covid-19-dashboard/main.py
+
 ## Requirements
 Requirements can be installed with `pip install requirements.txt`.
 
